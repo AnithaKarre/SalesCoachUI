@@ -93,7 +93,7 @@ function ManagerDashboard() {
               {data.data?.team.map((t, i) => (
                 <li
                   key={t.id}
-                  className="group flex items-center gap-3 rounded-xl border border-border bg-secondary/40 p-3 transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/30 hover:bg-secondary hover:shadow-elegant"
+                  className="group flex items-center gap-3 rounded-xl border border-border bg-secondary/40 p-3 transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/30 hover:bg-secondary"
                 >
                   <div
                     className={[
@@ -183,7 +183,8 @@ function ManagerKpi({
             ? <div className="skeleton mt-2 h-8 w-24 rounded-md" />
             : <p className="mt-1 text-3xl font-bold">{value}</p>}
         </div>
-        <div className={`grid h-11 w-11 shrink-0 place-items-center rounded-xl ${gradient} text-primary-foreground shadow-elegant transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3`}>
+        <div className={`grid h-11 w-11 shrink-0 place-items-center rounded-xl ${gradient} text-primary-foreground shadow-elegant transition-transform duration-300 group-hover:scale-110 group-hover:opacity-90`}
+        >
           {icon}
         </div>
       </div>
