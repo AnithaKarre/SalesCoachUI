@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppManagerRouteImport } from './routes/_app.manager'
 import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
 import { Route as AppMerchantsIdRouteImport } from './routes/_app.merchants.$id'
 
@@ -29,6 +30,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppManagerRoute = AppManagerRouteImport.update({
+  id: '/manager',
+  path: '/manager',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppDashboardRoute = AppDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -44,12 +50,14 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/dashboard': typeof AppDashboardRoute
+  '/manager': typeof AppManagerRoute
   '/merchants/$id': typeof AppMerchantsIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/dashboard': typeof AppDashboardRoute
+  '/manager': typeof AppManagerRoute
   '/merchants/$id': typeof AppMerchantsIdRoute
 }
 export interface FileRoutesById {
@@ -58,19 +66,21 @@ export interface FileRoutesById {
   '/_app': typeof AppRouteWithChildren
   '/login': typeof LoginRoute
   '/_app/dashboard': typeof AppDashboardRoute
+  '/_app/manager': typeof AppManagerRoute
   '/_app/merchants/$id': typeof AppMerchantsIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/dashboard' | '/merchants/$id'
+  fullPaths: '/' | '/login' | '/dashboard' | '/manager' | '/merchants/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/dashboard' | '/merchants/$id'
+  to: '/' | '/login' | '/dashboard' | '/manager' | '/merchants/$id'
   id:
     | '__root__'
     | '/'
     | '/_app'
     | '/login'
     | '/_app/dashboard'
+    | '/_app/manager'
     | '/_app/merchants/$id'
   fileRoutesById: FileRoutesById
 }
@@ -103,6 +113,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_app/manager': {
+      id: '/_app/manager'
+      path: '/manager'
+      fullPath: '/manager'
+      preLoaderRoute: typeof AppManagerRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/dashboard': {
       id: '/_app/dashboard'
       path: '/dashboard'
@@ -122,11 +139,13 @@ declare module '@tanstack/react-router' {
 
 interface AppRouteChildren {
   AppDashboardRoute: typeof AppDashboardRoute
+  AppManagerRoute: typeof AppManagerRoute
   AppMerchantsIdRoute: typeof AppMerchantsIdRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppDashboardRoute: AppDashboardRoute,
+  AppManagerRoute: AppManagerRoute,
   AppMerchantsIdRoute: AppMerchantsIdRoute,
 }
 
