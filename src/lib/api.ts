@@ -63,3 +63,60 @@ export async function getMerchantScoreLive(name: string) {
 export async function getMerchantRecommendationLive(name: string) {
   return apiFetch<{ answer: string }>(`/merchants/${encodeURIComponent(name)}/recommendation`);
 }
+
+/** GET /merchants — fetch all merchants list */
+export async function getMerchants() {
+  return apiFetch<any[]>("/merchants");
+}
+
+/** GET /merchants/{id} — fetch single merchant by ID */
+export async function getMerchantById(id: string) {
+  return apiFetch<any>(`/merchants/${encodeURIComponent(id)}`);
+}
+
+/** GET /merchants/{id}/score — fetch merchant priority score */
+export async function getMerchantScore(id: string) {
+  return apiFetch<{
+    priorityScore: number;
+    breakdown: Array<{ label: string; value: number }>;
+  }>(`/merchants/${encodeURIComponent(id)}/score`);
+}
+
+/** PATCH /merchants/{id}/status — update merchant status */
+export async function updateMerchantStatus(id: string, status: string) {
+  return apiFetch<{ status: string }>(`/merchants/${encodeURIComponent(id)}/status`, {
+    method: "PATCH",
+    body: JSON.stringify({ status }),
+  });
+}
+
+/** GET /dashboard/dsp — fetch DSP dashboard summary */
+export async function getDspDashboard(userId?: string) {
+  return apiFetch<{
+    agentName: string;
+    visitsToday: number;
+    visitsGoal: number;
+    conversionRate: number;
+    pendingActions: number;
+    weeklyVisits: Array<{ day: string; visits: number; goal: number }>;
+  }>(`/dashboard/dsp${userId ? `?user_id=${encodeURIComponent(userId)}` : ""}`);
+}
+
+/** GET /dashboard/manager — fetch manager dashboard summary */
+export async function getManagerDashboard() {
+  return apiFetch<{
+    totalDsps: number;
+    totalMerchants: number;
+    avgPriorityScore: number;
+    weeklyVisits: number;
+    team: Array<{
+      id: string;
+      name: string;
+      area: string;
+      visits: number;
+      conversion: number;
+      score: number;
+    }>;
+    visitsByArea: Array<{ area: string; visits: number; target: number }>;
+  }>("/dashboard/manager");
+}
