@@ -101,7 +101,7 @@ function LoginPage() {
 
               <button
                 type="submit" disabled={loading}
-                className="group relative w-full overflow-hidden rounded-xl bg-gradient-primary px-4 py-3 text-sm font-semibold text-primary-foreground shadow-elegant transition-all duration-300 hover:-translate-y-0.5 hover:shadow-glow disabled:opacity-70"
+                className="group relative w-full overflow-hidden rounded-xl bg-gradient-primary px-4 py-3 text-sm font-semibold text-primary-foreground shadow-elegant transition-all duration-300 hover:shadow-2xl disabled:opacity-60"
               >
                 <span className="relative z-10 inline-flex items-center justify-center gap-2">
                   {loading ? <><Loader2 className="h-4 w-4 animate-spin" /> Signing in…</> : "Sign in"}
@@ -128,7 +128,7 @@ function FieldEmail({ value, onChange }: { value: string; onChange: (v: string) 
         <input
           type="email" required autoComplete="email" placeholder="agent@gcash.com"
           value={value} onChange={(e) => onChange(e.target.value)}
-          className="w-full rounded-xl border border-border bg-white/80 py-2.5 pl-9 pr-3 text-sm outline-none transition-all duration-200 hover:border-primary/40 focus:border-primary focus:bg-white focus:ring-4 focus:ring-primary/15"
+          className="w-full rounded-xl border border-border bg-white/80 py-2.5 pl-9 pr-3 text-sm outline-none transition-all duration-200 hover:border-primary/40 focus:border-primary focus:bg-white/95 focus:ring-4 focus:ring-primary/20"
         />
       </div>
     </label>
@@ -147,7 +147,7 @@ function FieldPassword({
           type={show ? "text" : "password"} required autoComplete="current-password"
           placeholder="••••••••"
           value={value} onChange={(e) => onChange(e.target.value)}
-          className="w-full rounded-xl border border-border bg-white/80 py-2.5 pl-9 pr-10 text-sm outline-none transition-all duration-200 hover:border-primary/40 focus:border-primary focus:bg-white focus:ring-4 focus:ring-primary/15"
+          className="w-full rounded-xl border border-border bg-white/80 py-2.5 pl-9 pr-10 text-sm outline-none transition-all duration-200 hover:border-primary/40 focus:border-primary focus:bg-white/95 focus:ring-4 focus:ring-primary/20"
         />
         <button
           type="button" onClick={onToggle}

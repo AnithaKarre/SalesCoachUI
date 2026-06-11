@@ -46,7 +46,7 @@ export function ChatWidget() {
       setMessages([{
         id: "welcome",
         role: "assistant",
-        text: `Hi **${user.username}**, I am your **SalesCoach AI**. How can I help you today?\n\nYou can ask me about:\n- Top priority merchants in your area\n- Why a merchant's score changed\n- Best-practice talking points for a visit`,
+        text: `Hi **${user.username}**, I am your **SalesCoach AI**. How can I help you today?\n\nYou can ask me about:\n- Top priority merchants in your area\n- Why a merchant's score changed\n- How to improve your conversion rate\n- Specific merchant insights\n- Next best actions for your shift`,
       }]);
     }
   }, [open, messages.length, user]);
@@ -80,7 +80,7 @@ export function ChatWidget() {
         {
           id: `a-${Date.now()}`,
           role: "assistant",
-          text: `${message}\n\n_Demo response_: For **${text}**, I'd recommend starting with the top 3 prioritized merchants on your dashboard, focusing on those with the largest transaction declines.`,
+          text: `${message}\n\n_Demo response_: For **${text}**, I'd recommend starting with the top 3 prioritized merchants on your dashboard, focusing on those with the largest transaction declines or longest time without visits.`,
         },
       ]);
     } finally {
@@ -96,7 +96,7 @@ export function ChatWidget() {
       <button
         onClick={() => setOpen((v) => !v)}
         aria-label={open ? "Close chat" : "Open chat"}
-        className="fixed bottom-6 right-6 z-40 grid h-14 w-14 place-items-center rounded-full bg-gradient-primary text-primary-foreground shadow-elegant transition-all duration-300 hover:scale-110 hover:shadow-glow"
+        className="fixed bottom-6 right-6 z-40 grid h-14 w-14 place-items-center rounded-full bg-gradient-primary text-primary-foreground shadow-elegant transition-all duration-300 hover:scale-110 hover:shadow-2xl"
       >
         {open ? <X className="h-6 w-6" /> : <MessageCircle className="h-6 w-6" />}
         {!open && (
@@ -107,7 +107,7 @@ export function ChatWidget() {
       </button>
 
       {open && (
-        <div className="slide-up fixed bottom-24 right-4 z-40 flex h-[600px] max-h-[calc(100vh-7rem)] w-[calc(100vw-2rem)] max-w-[400px] flex-col overflow-hidden rounded-3xl border border-border bg-card shadow-elegant">
+        <div className="slide-up fixed bottom-24 right-4 z-40 flex h-[600px] max-h-[calc(100vh-7rem)] w-[calc(100vw-2rem)] max-w-[400px] flex-col overflow-hidden rounded-3xl border border-border bg-card shadow-2xl">
           {/* Header */}
           <div className="relative overflow-hidden bg-gradient-primary p-4 text-primary-foreground">
             <div className="bg-mesh pointer-events-none absolute inset-0 opacity-40" />
@@ -168,12 +168,12 @@ export function ChatWidget() {
                 }}
                 placeholder="Ask anything about your merchants…"
                 rows={1}
-                className="max-h-32 min-h-[40px] flex-1 resize-none rounded-xl border border-border bg-background px-3 py-2 text-sm outline-none transition-all focus:border-primary focus:ring-4 focus:ring-primary/15"
+                className="max-h-32 min-h-[40px] flex-1 resize-none rounded-xl border border-border bg-background px-3 py-2 text-sm outline-none transition-all focus:border-primary focus:ring-4 focus:ring-primary/20"
               />
               <button
                 type="submit"
                 disabled={!input.trim() || sending}
-                className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-gradient-primary text-primary-foreground shadow-elegant transition-all duration-300 hover:-translate-y-0.5 hover:shadow-glow disabled:opacity-40 disabled:hover:translate-y-0"
+                className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-gradient-primary text-primary-foreground shadow-elegant transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg disabled:opacity-50"
               >
                 {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
               </button>

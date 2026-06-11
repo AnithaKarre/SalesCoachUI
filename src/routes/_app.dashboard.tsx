@@ -102,7 +102,8 @@ function KpiCard({
           )}
           <p className="mt-1 text-xs text-muted-foreground">{hint}</p>
         </div>
-        <div className={`grid h-11 w-11 shrink-0 place-items-center rounded-xl ${gradient} text-primary-foreground shadow-elegant transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3`}>
+        <div className={`grid h-11 w-11 shrink-0 place-items-center rounded-xl ${gradient} text-primary-foreground shadow-elegant transition-transform duration-300 group-hover:scale-110 group-hover:opacity-90`}
+        >
           {icon}
         </div>
       </div>
