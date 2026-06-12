@@ -14,6 +14,9 @@ import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppManagerRouteImport } from './routes/_app.manager'
 import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
+import { Route as AppChatRouteImport } from './routes/_app.chat'
+import { Route as AppAdminRouteImport } from './routes/_app.admin'
+import { Route as AppMerchantsIndexRouteImport } from './routes/_app.merchants.index'
 import { Route as AppMerchantsIdRouteImport } from './routes/_app.merchants.$id'
 
 const LoginRoute = LoginRouteImport.update({
@@ -40,6 +43,21 @@ const AppDashboardRoute = AppDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AppRoute,
 } as any)
+const AppChatRoute = AppChatRouteImport.update({
+  id: '/chat',
+  path: '/chat',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAdminRoute = AppAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppMerchantsIndexRoute = AppMerchantsIndexRouteImport.update({
+  id: '/merchants/',
+  path: '/merchants/',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppMerchantsIdRoute = AppMerchantsIdRouteImport.update({
   id: '/merchants/$id',
   path: '/merchants/$id',
@@ -49,39 +67,67 @@ const AppMerchantsIdRoute = AppMerchantsIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/admin': typeof AppAdminRoute
+  '/chat': typeof AppChatRoute
   '/dashboard': typeof AppDashboardRoute
   '/manager': typeof AppManagerRoute
   '/merchants/$id': typeof AppMerchantsIdRoute
+  '/merchants/': typeof AppMerchantsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/admin': typeof AppAdminRoute
+  '/chat': typeof AppChatRoute
   '/dashboard': typeof AppDashboardRoute
   '/manager': typeof AppManagerRoute
   '/merchants/$id': typeof AppMerchantsIdRoute
+  '/merchants': typeof AppMerchantsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_app': typeof AppRouteWithChildren
   '/login': typeof LoginRoute
+  '/_app/admin': typeof AppAdminRoute
+  '/_app/chat': typeof AppChatRoute
   '/_app/dashboard': typeof AppDashboardRoute
   '/_app/manager': typeof AppManagerRoute
   '/_app/merchants/$id': typeof AppMerchantsIdRoute
+  '/_app/merchants/': typeof AppMerchantsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/dashboard' | '/manager' | '/merchants/$id'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/admin'
+    | '/chat'
+    | '/dashboard'
+    | '/manager'
+    | '/merchants/$id'
+    | '/merchants/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/dashboard' | '/manager' | '/merchants/$id'
+  to:
+    | '/'
+    | '/login'
+    | '/admin'
+    | '/chat'
+    | '/dashboard'
+    | '/manager'
+    | '/merchants/$id'
+    | '/merchants'
   id:
     | '__root__'
     | '/'
     | '/_app'
     | '/login'
+    | '/_app/admin'
+    | '/_app/chat'
     | '/_app/dashboard'
     | '/_app/manager'
     | '/_app/merchants/$id'
+    | '/_app/merchants/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -127,6 +173,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppDashboardRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/chat': {
+      id: '/_app/chat'
+      path: '/chat'
+      fullPath: '/chat'
+      preLoaderRoute: typeof AppChatRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/admin': {
+      id: '/_app/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AppAdminRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/merchants/': {
+      id: '/_app/merchants/'
+      path: '/merchants'
+      fullPath: '/merchants/'
+      preLoaderRoute: typeof AppMerchantsIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/merchants/$id': {
       id: '/_app/merchants/$id'
       path: '/merchants/$id'
@@ -138,15 +205,21 @@ declare module '@tanstack/react-router' {
 }
 
 interface AppRouteChildren {
+  AppAdminRoute: typeof AppAdminRoute
+  AppChatRoute: typeof AppChatRoute
   AppDashboardRoute: typeof AppDashboardRoute
   AppManagerRoute: typeof AppManagerRoute
   AppMerchantsIdRoute: typeof AppMerchantsIdRoute
+  AppMerchantsIndexRoute: typeof AppMerchantsIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppAdminRoute: AppAdminRoute,
+  AppChatRoute: AppChatRoute,
   AppDashboardRoute: AppDashboardRoute,
   AppManagerRoute: AppManagerRoute,
   AppMerchantsIdRoute: AppMerchantsIdRoute,
+  AppMerchantsIndexRoute: AppMerchantsIndexRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)

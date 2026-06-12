@@ -29,7 +29,10 @@ function LoginPage() {
     try {
       const user = await login(email.trim(), password);
       toast.success(`Welcome, ${user.username}!`);
-      navigate({ to: user.role === "Manager" ? "/manager" : "/dashboard" });
+      const target =
+        user.role === "Admin" ? "/admin" :
+        user.role === "Manager" ? "/manager" : "/dashboard";
+      navigate({ to: target });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Login failed");
     } finally {

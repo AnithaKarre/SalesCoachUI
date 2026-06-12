@@ -1,122 +1,162 @@
 /**
- * Lightweight fetch wrapper for the SalesCoach AI backend.
- * Attaches Authorization: Bearer <token> automatically.
+ * SalesCoach AI backend client.
+ *
+ * Base URL: http://localhost:8000/api/v1
+ * All requests include `Authorization: Bearer <token>` when a token is present
+ * in localStorage. Errors are thrown as ApiError so callers / React Query can
+ * surface a toast.
  */
 import { getStoredToken } from "./auth";
 
-export const API_BASE = "http://localhost:8080/api/v1";
+export const API_BASE = "http://localhost:8000/api/v1";
 
 export class ApiError extends Error {
   constructor(public status: number, message: string) {
     super(message);
+    this.name = "ApiError";
   }
 }
 
-export async function apiFetch<T = unknown>(
+export async function apiFetch<T = any>(
   path: string,
   init: RequestInit = {},
 ): Promise<T> {
   const token = getStoredToken();
   const headers = new Headers(init.headers);
-  if (!headers.has("Content-Type") && init.body) headers.set("Content-Type", "application/json");
-  if (token) headers.set("Authorization", `Bearer ${token}`);
+  if (!headers.has("Content-Type") && init.body && typeof init.body === "string") {
+    headers.set("Content-Type", "application/json");
+  }
+  if (token && !headers.has("Authorization")) {
+    headers.set("Authorization", `Bearer ${token}`);
+  }
+  headers.set("Accept", "application/json");
 
-  const res = await fetch(`${API_BASE}${path}`, { ...init, headers });
+  let res: Response;
+  try {
+    res = await fetch(`${API_BASE}${path}`, { ...init, headers });
+  } catch (e) {
+    throw new ApiError(0, `Network error reaching backend (${API_BASE}${path}).`);
+  }
+
   const text = await res.text();
   const data = text ? safeParse(text) : null;
   if (!res.ok) {
-    const msg = (data && (data.detail || data.message)) || res.statusText || "Request failed";
-    throw new ApiError(res.status, msg);
+    const msg =
+      (data && (data.detail || data.message || data.error)) ||
+      res.statusText ||
+      "Request failed";
+    throw new ApiError(res.status, typeof msg === "string" ? msg : JSON.stringify(msg));
   }
   return data as T;
 }
 
 function safeParse(text: string): any {
-  try {
-    return JSON.parse(text);
-  } catch {
-    return text;
-  }
+  try { return JSON.parse(text); } catch { return text; }
 }
 
-/** POST /chat — real backend endpoint */
-export async function askCoach(message: string, user?: { id?: string; role?: string }) {
-  return apiFetch<{ agent: string; answer: string }>("/chat", {
+/* ----------------------------- Auth ----------------------------- */
+
+export async function authLogin(email: string, password: string) {
+  return apiFetch<{ access_token?: string; token?: string; [k: string]: any }>(
+    "/auth/login",
+    { method: "POST", body: JSON.stringify({ email, password }) },
+  );
+}
+
+export async function authMe() {
+  return apiFetch<any>("/auth/me");
+}
+
+export async function authLogout() {
+  return apiFetch<any>("/auth/logout", { method: "POST" });
+}
+
+/* --------------------------- Dashboards ------------------------- */
+
+export async function getDashboard(role: "dsp" | "manager" | "admin") {
+  return apiFetch<any>(`/dashboard/${role}`);
+}
+
+/* ---------------------------- Merchants ------------------------- */
+
+export async function getPrioritizedMerchants() {
+  return apiFetch<any[]>("/merchants/prioritized");
+}
+
+export async function getMerchantDetail(id: string) {
+  return apiFetch<any>(`/merchants/${encodeURIComponent(id)}/detail`);
+}
+
+export async function getMerchantHistory(id: string) {
+  return apiFetch<any[]>(`/merchants/${encodeURIComponent(id)}/history`);
+}
+
+export async function updateRecommendationStatus(
+  recommendationId: string,
+  status: string,
+) {
+  return apiFetch<any>(
+    `/recommendations/${encodeURIComponent(recommendationId)}/status`,
+    { method: "PATCH", body: JSON.stringify({ status }) },
+  );
+}
+
+/* ------------------------------- Chat --------------------------- */
+
+export async function getChatHistory() {
+  return apiFetch<any[]>("/chat/history");
+}
+
+export async function postChat(message: string) {
+  return apiFetch<any>("/chat", {
     method: "POST",
-    body: JSON.stringify({
-      message,
-      user_id: user?.id,
-      user_role: user?.role,
-    }),
+    body: JSON.stringify({ message }),
   });
 }
 
-/** GET /merchants/{name}/brief — real backend endpoint */
-export async function getMerchantBrief(name: string) {
-  return apiFetch<{ answer: string }>(`/merchants/${encodeURIComponent(name)}/brief`);
+/* ----------------------------- Manager -------------------------- */
+
+export async function getManagerAreaSummary() {
+  return apiFetch<any>("/manager/area-summary");
 }
 
-export async function getMerchantScoreLive(name: string) {
-  return apiFetch<{ answer: string }>(`/merchants/${encodeURIComponent(name)}/score`);
+export async function getManagerTeam() {
+  return apiFetch<any[]>("/manager/team");
 }
 
-export async function getMerchantRecommendationLive(name: string) {
-  return apiFetch<{ answer: string }>(`/merchants/${encodeURIComponent(name)}/recommendation`);
+/* ------------------------------ Admin --------------------------- */
+
+export async function adminListUsers() {
+  return apiFetch<any[]>("/admin/users");
 }
 
-/** GET /merchants — fetch all merchants list */
-export async function getMerchants() {
-  return apiFetch<any[]>("/merchants");
+export async function adminCreateUser(payload: Record<string, any>) {
+  return apiFetch<any>("/admin/users", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
 }
 
-/** GET /merchants/{id} — fetch single merchant by ID */
-export async function getMerchantById(id: string) {
-  return apiFetch<any>(`/merchants/${encodeURIComponent(id)}`);
-}
-
-/** GET /merchants/{id}/score — fetch merchant priority score */
-export async function getMerchantScore(id: string) {
-  return apiFetch<{
-    priorityScore: number;
-    breakdown: Array<{ label: string; value: number }>;
-  }>(`/merchants/${encodeURIComponent(id)}/score`);
-}
-
-/** PATCH /merchants/{id}/status — update merchant status */
-export async function updateMerchantStatus(id: string, status: string) {
-  return apiFetch<{ status: string }>(`/merchants/${encodeURIComponent(id)}/status`, {
+export async function adminUpdateUser(id: string, payload: Record<string, any>) {
+  return apiFetch<any>(`/admin/users/${encodeURIComponent(id)}`, {
     method: "PATCH",
-    body: JSON.stringify({ status }),
+    body: JSON.stringify(payload),
   });
 }
 
-/** GET /dashboard/dsp — fetch DSP dashboard summary */
-export async function getDspDashboard(userId?: string) {
-  return apiFetch<{
-    agentName: string;
-    visitsToday: number;
-    visitsGoal: number;
-    conversionRate: number;
-    pendingActions: number;
-    weeklyVisits: Array<{ day: string; visits: number; goal: number }>;
-  }>(`/dashboard/dsp${userId ? `?user_id=${encodeURIComponent(userId)}` : ""}`);
+export async function adminDeactivateUser(id: string) {
+  return apiFetch<any>(`/admin/users/${encodeURIComponent(id)}`, {
+    method: "DELETE",
+  });
 }
 
-/** GET /dashboard/manager — fetch manager dashboard summary */
-export async function getManagerDashboard() {
-  return apiFetch<{
-    totalDsps: number;
-    totalMerchants: number;
-    avgPriorityScore: number;
-    weeklyVisits: number;
-    team: Array<{
-      id: string;
-      name: string;
-      area: string;
-      visits: number;
-      conversion: number;
-      score: number;
-    }>;
-    visitsByArea: Array<{ area: string; visits: number; target: number }>;
-  }>("/dashboard/manager");
+export async function adminChangeUserRole(id: string, role: string) {
+  return apiFetch<any>(`/admin/users/${encodeURIComponent(id)}/role`, {
+    method: "PATCH",
+    body: JSON.stringify({ role }),
+  });
+}
+
+export async function adminGetAuditLogs() {
+  return apiFetch<any[]>("/admin/audit-logs");
 }
