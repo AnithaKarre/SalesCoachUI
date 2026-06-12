@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { MessageCircle, Send, Sparkles, X, Loader2 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
-import { askCoach, ApiError } from "@/lib/api";
+import { postChat, ApiError } from "@/lib/api";
 
 interface Msg {
   id: string;
@@ -65,10 +65,13 @@ export function ChatWidget() {
     setMessages((m) => [...m, userMsg]);
     setSending(true);
     try {
-      const res = await askCoach(text, { role: user?.role });
+      const res: any = await postChat(text);
+      const answer =
+        res?.answer ?? res?.reply ?? res?.message ?? res?.content ??
+        (typeof res === "string" ? res : "I'm not sure how to answer that yet.");
       setMessages((m) => [
         ...m,
-        { id: `a-${Date.now()}`, role: "assistant", text: res.answer || "I'm not sure how to answer that yet." },
+        { id: `a-${Date.now()}`, role: "assistant", text: String(answer) },
       ]);
     } catch (err) {
       const message =
